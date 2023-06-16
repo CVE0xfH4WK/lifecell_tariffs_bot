@@ -3,10 +3,9 @@ import asyncio
 from aiogram import Router
 from aiogram.filters import Command, Text
 from aiogram.fsm.context import FSMContext
-from aiogram.fsm.state import State, StatesGroup 
-from aiogram.types import Message, KeyboardButton, InlineKeyboardButton, CallbackQuery, ReplyKeyboardRemove
-from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
 from aiogram.fsm.state import State, StatesGroup
+from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
+from aiogram.types import Message, KeyboardButton, InlineKeyboardButton, CallbackQuery
 
 
 from src.question_logics import Checker
@@ -71,22 +70,26 @@ async def internet_signal(message: Message, state: FSMContext):
 
 
     await message.answer(
-        "Що для вас в пріорететі, мобільний інтернет чи хвилини?",
+        "Що для вас в пріоритеті, мобільний інтернет чи хвилини?",
         reply_markup=builder.as_markup()
     )
+    await state.clear()
 
 
 @router.callback_query(Text("internet"))
 async def internet(callback: CallbackQuery):
-    await callback.message.answer('Яка кількість гб Вас задовольнить?')\
+    await callback.message.answer('Яка кількість ГБ Вас задовольнить?')\
     #add_inline_buttons
     await callback.answer()
 
 @router.callback_query(Text("minutes"))
-async def internet(callback: CallbackQuery):
+async def minutes(callback: CallbackQuery):
     await callback.message.answer('Яка кількість хвилин Вас задовольнить?')
     #add_inline_buttons
     await callback.answer()
+
+
+
 '''
 @router.callback_query(Text("option_choice_1"))
 async def opt_1(callback: CallbackQuery):

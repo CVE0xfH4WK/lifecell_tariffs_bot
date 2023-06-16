@@ -7,9 +7,9 @@ class Checker:
         pass
 
 
-    def check_net(self) -> None:
+    def check_(self) -> None:
         pass
 
     
-    def check_signal(self) -> None:
+    def check_minutes(self) -> None:
         pass
