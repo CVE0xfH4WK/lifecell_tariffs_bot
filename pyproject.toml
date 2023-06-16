@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "lifecell-tariffs-bot-test-repo"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+packages = [{include = "lifecell_tariffs_bot_test_repo"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+aiogram = "^3.0.0b7"
+selenium = "^4.10.0"
+pydantic = "^1.10.9"
+aiofiles = "^23.1.0"
+beautifulsoup4 = "^4.12.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
