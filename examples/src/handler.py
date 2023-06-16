@@ -1,7 +1,6 @@
 import asyncio
-import logging
 
-from aiogram import Bot, Dispatcher, Router
+from aiogram import Router
 from aiogram.filters import Command, Text
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup 
@@ -60,18 +59,34 @@ async def internet_signal(message: Message, state: FSMContext):
     
     builder = InlineKeyboardBuilder()
 
-    for button_index in range(2):
-        builder.add(InlineKeyboardButton(
-            text=f"{button_index+1}",
-            callback_data=f"{button_index+1}"
-        ))
+    builder.add(InlineKeyboardButton(
+        text=f"Інтернет",
+        callback_data=f"internet"
+    ))
+
+    builder.add(InlineKeyboardButton(
+        text=f"Хвилини",
+        callback_data=f"minutes"
+    ))
+
 
     await message.answer(
-        "Що для вас в приорвітеті, мобільний інтернет чи хвилини?",
+        "Що для вас в пріорететі, мобільний інтернет чи хвилини?",
         reply_markup=builder.as_markup()
     )
 
 
+@router.callback_query(Text("internet"))
+async def internet(callback: CallbackQuery):
+    await callback.message.answer('Яка кількість гб Вас задовольнить?')\
+    #add_inline_buttons
+    await callback.answer()
+
+@router.callback_query(Text("minutes"))
+async def internet(callback: CallbackQuery):
+    await callback.message.answer('Яка кількість хвилин Вас задовольнить?')
+    #add_inline_buttons
+    await callback.answer()
 '''
 @router.callback_query(Text("option_choice_1"))
 async def opt_1(callback: CallbackQuery):
