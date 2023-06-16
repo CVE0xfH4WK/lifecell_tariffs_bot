@@ -7,7 +7,7 @@ from aiogram.types import Message, KeyboardButton, InlineKeyboardButton, Callbac
 from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
 
 
-TOKEN = "5854058468:AAF7M9iguvHXs_kiBRQbN5ei03dXkYpTUNo"
+TOKEN = "BOT_TOKEN"
 
 router = Router()
 
