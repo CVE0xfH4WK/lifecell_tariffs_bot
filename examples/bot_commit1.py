@@ -1,5 +1,4 @@
 import asyncio
-import logging
 
 from aiogram import Bot, Dispatcher, Router
 from aiogram.filters import Command, Text
@@ -7,7 +6,6 @@ from aiogram.types import Message, KeyboardButton, InlineKeyboardButton, Callbac
 from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
 
 
-TOKEN = "BOT_TOKEN"
 
 router = Router()
 
@@ -67,15 +65,3 @@ async def opt_1(callback: CallbackQuery):
     await callback.answer()
 
 
-async def main():
-    dp = Dispatcher()
-    dp.include_router(router)
-
-    bot = Bot(TOKEN, parse_mode='HTML')
-
-    await dp.start_polling(bot)
-
-
-if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
-    asyncio.run(main())
