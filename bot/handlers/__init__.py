@@ -1,14 +1,10 @@
-import asyncio
-
 from aiogram import Router
 from aiogram.filters import Command, Text
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
-from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
-from aiogram.types import Message, KeyboardButton, InlineKeyboardButton, CallbackQuery
-
-
-from src.question_logics import Checker
+from aiogram.types import (CallbackQuery, InlineKeyboardButton, KeyboardButton,
+                           Message)
+from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
 
 
 class DB(StatesGroup):
@@ -31,6 +27,8 @@ async def start(message: Message):
         builder.add(KeyboardButton(text=button))
     builder.adjust(2)
 
+
+    # FIXME: The message from user can be undefined, see how it works and fix it
     await message.answer(f"Вітаю, {message.from_user.first_name}."
                          f"\nЯ - Lifecell Bot, офіційний бот компанії-оператора Lifecell."
                          f"\nОберіть дію, для того, щоб продорвжити : ",
@@ -59,13 +57,13 @@ async def internet_signal(message: Message, state: FSMContext):
     builder = InlineKeyboardBuilder()
 
     builder.add(InlineKeyboardButton(
-        text=f"Інтернет",
-        callback_data=f"internet"
+        text="Інтернет",
+        callback_data="internet"
     ))
 
     builder.add(InlineKeyboardButton(
-        text=f"Хвилини",
-        callback_data=f"minutes"
+        text="Хвилини",
+        callback_data="minutes"
     ))
 
 
@@ -78,37 +76,20 @@ async def internet_signal(message: Message, state: FSMContext):
 
 @router.callback_query(Text("internet"))
 async def internet(callback: CallbackQuery):
+    if callback.message is None:
+        return
+
     await callback.message.answer('Яка кількість ГБ Вас задовольнить?')\
-    #add_inline_buttons
+
+    # TODO: add_inline_buttons
     await callback.answer()
 
 @router.callback_query(Text("minutes"))
 async def minutes(callback: CallbackQuery):
+    if callback.message is None:
+        return
+
     await callback.message.answer('Яка кількість хвилин Вас задовольнить?')
-    #add_inline_buttons
+
+    # TODO: add_inline_buttons
     await callback.answer()
-
-
-
-'''
-@router.callback_query(Text("option_choice_1"))
-async def opt_1(callback: CallbackQuery):
-    await callback.message.answer("opt 1")
-    await callback.answer()
-
-
-@router.callback_query(Text("option_choice_2"))
-async def opt_1(callback: CallbackQuery):
-    await callback.message.answer("opt 2")
-    await callback.answer()
-
-
-@router.callback_query(Text("option_choice_3"))
-async def opt_1(callback: CallbackQuery):
-    await callback.message.answer("opt 3")
-    await callback.answer()
-'''
-
-
-#@router.callback_query(Text(""))
-#async def 

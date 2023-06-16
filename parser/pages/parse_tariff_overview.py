@@ -1,11 +1,11 @@
-import asyncio
 import re
-from parser.schema import (INFINITE_DATA_STRING, DataRange, GeneralOverview,
-                           GeneralTariffInfo, PhoneMinutesInfo,
-                           ServiceAmountData)
-from parser.utils.setup_driver import setup_driver
+from parser.schema.GeneralOverview import (INFINITE_DATA_STRING, DataRange,
+                                           GeneralOverview, GeneralTariffInfo,
+                                           PhoneMinutesInfo, ServiceAmountData)
+from parser.utils.redirect_and_create_soup import redirect_and_create_soup
 
-from bs4 import BeautifulSoup, Tag
+from bs4 import Tag
+from selenium.webdriver.chrome.webdriver import WebDriver
 
 TARIFF_OVERVIEW_URL = 'https://www.lifecell.ua/uk/mobilnij-zvyazok/taryfy/'
 INFINITE_STRING = 'безліміт'
@@ -14,6 +14,7 @@ DATA_UNITS = {
     'гб': 1,
     'хв': 1
 }
+
 
 def parse_traffic_number_gb(number_string: str) -> ServiceAmountData:
     if number_string.lower().startswith(INFINITE_STRING[:5]):
@@ -38,22 +39,17 @@ def parse_range_or_constant(
         )
 
 
-async def parse_tariff_overview() -> GeneralOverview:
-    driver = setup_driver()
-
-    driver.get(TARIFF_OVERVIEW_URL)
-    await asyncio.sleep(1)
-
-    contents = driver.page_source
-    driver.close()
-
-    soup = BeautifulSoup(contents, 'html.parser')
+async def parse_tariff_overview(driver: WebDriver) -> GeneralOverview:
+    soup = await redirect_and_create_soup(driver, TARIFF_OVERVIEW_URL)
 
     tariff_containers = soup.find_all(class_='css-ieznkm')
     info: list[GeneralTariffInfo] = []
 
     for container in tariff_containers:
         general_info = container.contents[0].contents[0]
+
+        details_page_link_a = general_info.contents[0]
+        details_page_link = f'https://www.lifecell.ua/{details_page_link_a["href"]}'
 
         price_and_duration_regex = r'[0-9]+'
         price, duration = re.findall(
@@ -75,6 +71,7 @@ async def parse_tariff_overview() -> GeneralOverview:
             additional_info.append(child.text)
         
         info.append(GeneralTariffInfo(
+            details_page_link=details_page_link,
             name=general_info.contents[0].text,
             min_price=price,
             duration_weeks=duration,

@@ -1,0 +1,8 @@
+{
+  "telegram": {
+    "bot_token": "YOUR_BOT_TOKEN"
+  },
+  "parser": {
+    "relative_export_directory": "./export"
+  }
+}
