@@ -1,11 +1,11 @@
-from bot_commit1 import router
+from src.handler import router
 
 import asyncio
 import logging
 
 from aiogram import Bot, Dispatcher, Router
 
-from config import TOKEN
+from src.config import TOKEN
 
 
 async def main():
