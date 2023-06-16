@@ -13,7 +13,7 @@ class PhoneMinutesInfo(BaseModel):
 
 class GeneralTariffInfo(BaseModel):
     name: str
-    price: int
+    min_price: int
     duration_weeks: int
     additional_info: list[str]
 

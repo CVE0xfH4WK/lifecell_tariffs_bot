@@ -67,17 +67,23 @@ async def parse_tariff_overview() -> GeneralOverview:
 
         phone_minutes_container = services_container.contents[1].contents[0].contents[1]
         phone_minutes = parse_range_or_constant(phone_minutes_container)
+
+        additional_info_container = container.contents[-2]
+        additional_info: list[str] = []
+
+        for child in additional_info_container.contents:
+            additional_info.append(child.text)
         
         info.append(GeneralTariffInfo(
             name=general_info.contents[0].text,
-            price=price,
+            min_price=price,
             duration_weeks=duration,
             cellular_gb=cellular,
             phone_minutes=PhoneMinutesInfo(
                 value=phone_minutes,
                 description=services_container.contents[1].contents[-1].text
             ),
-            additional_info=[]
+            additional_info=additional_info
         ))
 
     return GeneralOverview(
