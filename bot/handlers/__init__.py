@@ -2,14 +2,13 @@ from aiogram import Router
 from aiogram.filters import Command, Text
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
-from aiogram.methods.edit_message_text import EditMessageText
 from aiogram.types import (CallbackQuery, InlineKeyboardButton, KeyboardButton,
-                           ReplyKeyboardRemove, Message)
+                           Message, ReplyKeyboardRemove)
 from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
 
-
+from bot.data_provider import data_provider
+from bot.formatting.format_general_overview import format_general_tariff_info
 from bot.handlers.bot import bot
-
 
 mob_data_volume = [
     1, 10, 
@@ -47,6 +46,13 @@ router = Router()
 
 @router.message(Command(commands=["start"]))
 async def start(message: Message):
+    data = await data_provider.get_tariffs_overview()
+    # FIXME: 
+    if data is None:
+        return
+
+    await message.reply(format_general_tariff_info(data[0]))
+
     buttons = [
         "Про нас", "Всі тарифи",
         "Обрати тариф"
@@ -69,6 +75,7 @@ async def info(message: Message):
     await message.answer(
         "Lifecell - ваш надійний партнер у світі зв'язку. " 
         "Обирайте нас і отримайте високоякісні послуги та індивідуальний підхід до вашого зв'язку.")
+
 
 @router.message(Text("Всі тарифи"))
 async def all_tariffs(message: Message, state: FSMContext):

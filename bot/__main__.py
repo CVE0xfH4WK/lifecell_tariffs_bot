@@ -4,10 +4,13 @@ from aiogram import Dispatcher
 
 from bot.handlers import router
 from bot.handlers.bot import bot
+from data.db import init_connection
 from shared.logger import setup_loggers
 
 
 async def main():
+    await init_connection()
+
     dp = Dispatcher()
     dp.include_router(router)
 
