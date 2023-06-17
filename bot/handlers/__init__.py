@@ -3,15 +3,18 @@ from aiogram.filters import Command, Text
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import (CallbackQuery, InlineKeyboardButton, KeyboardButton,
-                           Message)
+                           ReplyKeyboardRemove, Message)
 from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
 
+
 mob_data_volume = [
-    
+    1, 10, 25,
+    "безліміт"
 ]
 
 minutes_volume = [
-    
+    10, 20, 30,
+    "безліміт"
 ]
 
 
@@ -55,23 +58,26 @@ async def choose_tariff(message: Message, state: FSMContext):
     
     await state.set_state(DB.price)
     await message.answer(
-        "Яка ціна вас задовольняє?")
+        "Яка ціна вас задовольняє?",
+        reply_markup=ReplyKeyboardRemove())
 
 
 @router.message(DB.price)
 async def internet_signal(message: Message, state: FSMContext):
+    # write price data
+
     await state.update_data(price=message.text)
     
     builder = InlineKeyboardBuilder()
 
     builder.add(InlineKeyboardButton(
         text="Інтернет",
-        callback_data="internet"
+        callback_data="act_internet"
     ))
 
     builder.add(InlineKeyboardButton(
         text="Хвилини",
-        callback_data="minutes"
+        callback_data="act_minutes"
     ))
 
 
@@ -82,42 +88,112 @@ async def internet_signal(message: Message, state: FSMContext):
     await state.clear()
 
 
-@router.callback_query(Text("internet"))
-async def internet(callback: CallbackQuery):
-    builder = InlineKeyboardBuilder()
-
-    for data in mob_data_volume:
-        builder.add(InlineKeyboardButton(
-            text=f"{data} ГБ",
-            callback_data=f"{data}"
-        ))
-
-    if callback.message is None:
-        return
-
-    await callback.message.answer(
-        'Яка кількість гігабайт вас задовольнить?',
-        reply_markup=builder.as_markup())
-
-    await callback.answer()
-
-
-@router.callback_query(Text("minutes"))
+@router.callback_query(Text(startswith="act_"))
 async def minutes(callback: CallbackQuery):
+    # write action data
+
+    builder = InlineKeyboardBuilder()
+    builder.adjust(2)
+    
+    if callback.data.split("_")[1] == "internet":
+        if callback.message is None:
+            return
+
+        for data in mob_data_volume:
+            builder.add(InlineKeyboardButton(
+                text=f"{data} ГБ",
+                callback_data=f"gb_{data}"
+            ))
+
+
+        await callback.message.answer(
+            'Яка кількість гігабайт вас задовольнить?',
+            reply_markup=builder.as_markup())
+
+        await callback.answer()
+    
+    
+    if callback.data.split("_")[1] == "minutes":
+        if callback.message is None:
+            return
+
+        for data in minutes_volume:
+            builder.add(InlineKeyboardButton(
+                text=f"{data} хв.",
+                callback_data=f"mins_{data}"
+            ))
+
+
+        await callback.message.answer(
+            'Яка кількість хвилин вас задовольнить?',
+            reply_markup=builder.as_markup())
+
+        await callback.answer()
+
+
+@router.callback_query(Text(startswith=["mins_", "gb_"]))
+async def sms(callback: CallbackQuery):
+    # write mins/gb data
     builder = InlineKeyboardBuilder()
 
-    for data in minutes_volume:
-        builder.add(InlineKeyboardButton(
-            text=f"{data} хв.",
-            callback_data=f"{data}"
-        ))
+    buttons = [
+        InlineKeyboardButton(
+            text="ніколи",
+            callback_data="sms_never"
+        ),
+        InlineKeyboardButton(
+            text="рідко",
+            callback_data="sms_seldome"
+        ),
+        InlineKeyboardButton(
+            text="часто",
+            callback_data="sms_often"
+        ),
+        InlineKeyboardButton(
+            text="дуже часто",
+            callback_data="sms_veryOften"
+        )
+    ]
 
-    if callback.message is None:
-        return
+    for button in buttons:
+        builder.add(button)
 
     await callback.message.answer(
-        'Яка кількість хвилин вас задовольнить?',
-        reply_markup=builder.as_markup())
-
+        'Як часто ви користуєтесь SMS повідомленнями?',
+        reply_markup=builder.as_markup()
+    )
 
     await callback.answer()
+
+
+@router.callback_query(Text(startswith="sms_"))
+async def rouming(callback: CallbackQuery):
+    # write sms data
+    builder = InlineKeyboardBuilder()
+
+    builder.add(
+        InlineKeyboardButton(
+            text="Так",
+            callback_data="roum_true"
+        )
+    )
+
+    builder.add(
+        InlineKeyboardButton(
+            text="Ні",
+            callback_data="roum_false"
+        )
+    )
+
+    await callback.message.answer(
+        text="Чи часто ви перебуваєте за кордоном?" 
+        "(це допоможе нам дізнатись чи потрібен вам роумінг)",
+        reply_markup=builder.as_markup()
+    )
+
+
+@router.callback_query(Text(startswith="roum_"))
+async def output_tariff(callback: CallbackQuery):
+    # choose tariff
+    
+    await callback.message.answer("тут буде підібраний тариф..")
