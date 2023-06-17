@@ -1,17 +1,16 @@
 import asyncio
 
-from aiogram import Bot, Dispatcher
+from aiogram import Dispatcher
 
 from bot.handlers import router
-from shared.config import config
+from bot.handlers.bot import bot
+
 from shared.logger import setup_loggers
 
 
 async def main():
     dp = Dispatcher()
     dp.include_router(router)
-
-    bot = Bot(config.telegram.bot_token, parse_mode='HTML')
 
     await dp.start_polling(bot)
 
