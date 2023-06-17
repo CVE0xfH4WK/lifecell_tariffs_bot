@@ -53,7 +53,7 @@ async def parse_tariff_overview(driver: WebDriver) -> list[GeneralTariffInfo]:
         general_info = container.contents[0].contents[0]
 
         details_page_link_a = general_info.contents[0]
-        details_page_link = f'https://www.lifecell.ua/{details_page_link_a["href"]}'
+        details_page_link = f'https://www.lifecell.ua{details_page_link_a["href"]}'
 
         price_and_duration_regex = r'[0-9]+'
         price, duration = re.findall(

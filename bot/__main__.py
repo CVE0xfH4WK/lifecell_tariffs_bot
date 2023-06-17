@@ -4,14 +4,12 @@ from aiogram import Dispatcher
 
 from bot.bot import bot
 from bot.handlers import router
-from bot.logics import closest_value
 from data.db import init_connection
 from shared.logger import setup_loggers
 
 
 async def main():
     await init_connection()
-    await closest_value()
 
     dp = Dispatcher()
     dp.include_router(router)
