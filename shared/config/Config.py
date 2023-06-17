@@ -13,9 +13,14 @@ class ParserConfig(BaseModel):
     relative_export_directory: Path
 
 
+class DBConfig(BaseModel):
+    connection_string: str
+
+
 class Config(BaseModel):
     telegram: TelegramConfig
     parser: ParserConfig
+    db: DBConfig
 
 
 class ConfigHandler:

@@ -4,5 +4,8 @@
   },
   "parser": {
     "relative_export_directory": "./export"
+  },
+  "db": {
+    "connection_string": "YOUR_MONGO_DB_CONNECTION_STRING"
   }
 }

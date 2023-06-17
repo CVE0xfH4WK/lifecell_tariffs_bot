@@ -13,6 +13,7 @@ selenium = "^4.10.0"
 pydantic = "^1.10.9"
 aiofiles = "^23.1.0"
 beautifulsoup4 = "^4.12.2"
+beanie = "^1.19.2"
 
 
 [build-system]
