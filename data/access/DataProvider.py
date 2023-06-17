@@ -23,7 +23,7 @@ class DataProvider:
 
     async def get_single_tariff_overview(
         self,
-        tarif_id: PydanticObjectId
+        tariff_id: PydanticObjectId
     ) -> GeneralTariffInfo | None:
         return await GeneralTariffInfo.get(tarif_id)
         

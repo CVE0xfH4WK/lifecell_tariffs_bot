@@ -15,7 +15,7 @@ FORMAT_TEMPLATE = '''
 {additional_string}
 '''
 
-def format_general_tariff_info(data: GeneralTariffInfo) -> str:
+def format_general_overview(data: GeneralTariffInfo) -> str:
     additional_string = ''.join(map(lambda item: f'    {item}\n', data.additional_info))
 
     result = FORMAT_TEMPLATE.format(
