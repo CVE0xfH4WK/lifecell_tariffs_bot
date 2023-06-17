@@ -75,10 +75,6 @@ async def gather_and_save(export_dir: Path) -> Tariffs:
 
     tariffs = await parse_everyting()
 
-    logger.info('Inserting the parsed data into the db')
-    await GeneralTariffInfo.insert_many(tariffs.tarrifs_overview)
-    await DetailedInformation.insert_many(tariffs.detailed_information)
-
     # TODO: A config option to either export into json or save to the db
     export_file = export_dir.joinpath('tariffs.json')
     await export_to_json(export_file, tariffs)
