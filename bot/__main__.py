@@ -4,7 +4,6 @@ from aiogram import Dispatcher
 
 from bot.handlers import router
 from bot.handlers.bot import bot
-
 from shared.logger import setup_loggers
 
 
