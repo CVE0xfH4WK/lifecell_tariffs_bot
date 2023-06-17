@@ -20,8 +20,10 @@ minutes_volume = [
 
 class DB(StatesGroup):
     price = State()
-    internet = State()
-    signal = State()
+    internent_minutes_prio = State()
+    internent_minutes = State()
+    sms = State()
+    rouming = State()
 
 
 router = Router()
@@ -39,7 +41,6 @@ async def start(message: Message):
     builder.adjust(2)
 
 
-    # FIXME: The message from user can be undefined, see how it works and fix it
     await message.answer(f"Вітаю, {message.from_user.first_name}."
                          f"\nЯ - Lifecell Bot, офіційний бот компанії-оператора Lifecell."
                          f"\nОберіть дію, для того, щоб продорвжити : ",
@@ -66,6 +67,7 @@ async def choose_tariff(message: Message, state: FSMContext):
 async def internet_signal(message: Message, state: FSMContext):
     # write price data
 
+    await state.set_state(DB.internent_minutes_prio)
     await state.update_data(price=message.text)
     
     builder = InlineKeyboardBuilder()
@@ -85,12 +87,13 @@ async def internet_signal(message: Message, state: FSMContext):
         "Що для вас в пріоритеті, гігабайти чи хвилини?",
         reply_markup=builder.as_markup()
     )
-    await state.clear()
-
 
 @router.callback_query(Text(startswith="act_"))
-async def minutes(callback: CallbackQuery):
+async def minutes(callback: CallbackQuery, state: FSMContext):
     # write action data
+
+    await state.set_state(DB.internent_minutes)
+    await state.update_data(internet_minutes_prio=callback.data)
 
     builder = InlineKeyboardBuilder()
     builder.adjust(2)
@@ -132,8 +135,11 @@ async def minutes(callback: CallbackQuery):
 
 
 @router.callback_query(Text(startswith=["mins_", "gb_"]))
-async def sms(callback: CallbackQuery):
+async def sms(callback: CallbackQuery, state: FSMContext):
     # write mins/gb data
+    await state.set_state(DB.sms)
+    await state.update_data(internet_minutes=callback.data)
+
     builder = InlineKeyboardBuilder()
 
     buttons = [
@@ -164,11 +170,15 @@ async def sms(callback: CallbackQuery):
     )
 
     await callback.answer()
+    
 
 
 @router.callback_query(Text(startswith="sms_"))
-async def rouming(callback: CallbackQuery):
+async def rouming(callback: CallbackQuery, state: FSMContext):
     # write sms data
+    await state.set_state(DB.rouming)
+    await state.update_data(sms=callback.data)
+
     builder = InlineKeyboardBuilder()
 
     builder.add(
@@ -191,9 +201,19 @@ async def rouming(callback: CallbackQuery):
         reply_markup=builder.as_markup()
     )
 
+    
+
 
 @router.callback_query(Text(startswith="roum_"))
-async def output_tariff(callback: CallbackQuery):
+async def output_tariff(callback: CallbackQuery, state: FSMContext):
+    # write rouming data
+
+    await state.update_data(rouming=callback.data)
+
     # choose tariff
+
     
-    await callback.message.answer("тут буде підібраний тариф..")
+    data = await state.get_data()
+    await state.clear()
+    #await callback.message.answer("тут буде підібраний тариф..")
+    await callback.message.answer(f"DATA: {data}")

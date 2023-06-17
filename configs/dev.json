@@ -1,0 +1,8 @@
+{
+    "telegram": {
+      "bot_token": "6007417969:AAHF-mOiXnu7fs3HT4eH_Aknc4wkFPXUFtE"
+    },
+    "parser": {
+      "relative_export_directory": "./export"
+    }
+}
