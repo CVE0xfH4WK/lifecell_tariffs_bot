@@ -5,10 +5,8 @@ MAIN_LOGGER_NAME = 'main'
 
 
 def setup_loggers() -> logging.Logger:
-    root = logging.getLogger()
+    root = logging.root
     root.setLevel(logging.DEBUG)
-
-    logger = root.getChild(MAIN_LOGGER_NAME)
 
     file_handler = logging.FileHandler(
         'runtime.log',
@@ -30,10 +28,10 @@ def setup_loggers() -> logging.Logger:
     stdout_handler.setFormatter(console_formatter)
     file_handler.setFormatter(file_formatter)
 
-    logger.addHandler(file_handler)
-    logger.addHandler(stdout_handler)
+    root.addHandler(file_handler)
+    root.addHandler(stdout_handler)
 
-    return logger
+    return root
 
 
 def get_logger(module_name: str) -> logging.Logger:
