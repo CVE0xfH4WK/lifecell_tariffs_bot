@@ -1,9 +1,9 @@
-from beanie import Document
+from pydantic import BaseModel
 
 from data.db.models.DetailedInformation import DetailedInformation
-from data.db.models.GeneralOverview import GeneralOverview
+from data.db.models.GeneralTariffInfo import GeneralTariffInfo
 
 
-class Tariffs(Document):
-    general_overview: GeneralOverview
+class Tariffs(BaseModel):
+    tarrifs_overview: list[GeneralTariffInfo]
     detailed_information: list[DetailedInformation]

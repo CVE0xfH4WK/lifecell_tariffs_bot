@@ -3,10 +3,10 @@ import re
 from bs4 import Tag
 from selenium.webdriver.chrome.webdriver import WebDriver
 
-from data.db.models.GeneralOverview import (INFINITE_DATA_STRING, DataRange,
-                                            GeneralOverview, GeneralTariffInfo,
-                                            PhoneMinutesInfo,
-                                            ServiceAmountData)
+from data.db.models.GeneralTariffInfo import (INFINITE_DATA_STRING, DataRange,
+                                              GeneralTariffInfo,
+                                              PhoneMinutesInfo,
+                                              ServiceAmountData)
 from data.parser.utils.redirect_and_create_soup import redirect_and_create_soup
 from shared.logger import get_logger
 
@@ -43,7 +43,7 @@ def parse_range_or_constant(
         )
 
 
-async def parse_tariff_overview(driver: WebDriver) -> GeneralOverview:
+async def parse_tariff_overview(driver: WebDriver) -> list[GeneralTariffInfo]:
     soup = await redirect_and_create_soup(driver, TARIFF_OVERVIEW_URL)
 
     tariff_containers = soup.find_all(class_='css-ieznkm')
@@ -88,7 +88,7 @@ async def parse_tariff_overview(driver: WebDriver) -> GeneralOverview:
         ))
 
 
+    await GeneralTariffInfo.insert_many(info)
+
     logger.info(f'Parsed the general tariffs overview at {TARIFF_OVERVIEW_URL = }')
-    return GeneralOverview(
-        tariffs=info
-    )
+    return info

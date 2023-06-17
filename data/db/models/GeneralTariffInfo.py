@@ -1,5 +1,7 @@
+import datetime
 from typing import Literal
 
+from beanie import Document
 from pydantic import BaseModel
 
 ServiceAmountData = float | int | Literal['infinity']
@@ -12,7 +14,7 @@ class PhoneMinutesInfo(BaseModel):
     description: str
 
 
-class GeneralTariffInfo(BaseModel):
+class GeneralTariffInfo(Document):
     details_page_link: str
     name: str
     min_price: int
@@ -22,6 +24,7 @@ class GeneralTariffInfo(BaseModel):
     cellular_gb: ServiceAmountData | DataRange
     phone_minutes: PhoneMinutesInfo
 
-
-class GeneralOverview(BaseModel):
-    tariffs: list[GeneralTariffInfo]
+    class Settings:
+        use_cache = True
+        cache_expiration_time = datetime.timedelta(seconds=10)
+        cache_capacity = 25

@@ -6,6 +6,7 @@ from pydantic import BaseModel
 
 from data.db import init_connection
 from data.db.models.DetailedInformation import DetailedInformation
+from data.db.models.GeneralTariffInfo import GeneralTariffInfo
 from data.db.models.Tariffs import Tariffs
 from data.parser.pages.parse_detailed_info import parse_detailed_info
 from data.parser.pages.parse_tariff_overview import parse_tariff_overview
@@ -17,21 +18,24 @@ EXPORT_DIR = config.parser.relative_export_directory
 logger = get_logger(__name__)
 
 
-# TODO: Make a brief cli tool for clearning all the data and parsing with saving in different variants
+# TODO: Make a brief cli tool for clearing all the data and parsing with saving in different variants
 # TODO: Make a driver pool when the detailed info parsing is implemented
 async def parse_everyting() -> Tariffs:
     logger.info('Pasing all the data from lifecell')
     driver = setup_driver()
 
-    tariff_overview = await parse_tariff_overview(driver)
-    all_detailed_info: list[DetailedInformation] = []
-    for tariff in tariff_overview.tariffs:
+    tariffs_overview = await parse_tariff_overview(driver)
+    info_to_insert: list[DetailedInformation] = []
+
+    for tariff in tariffs_overview:
         single_page_data = await parse_detailed_info(driver, tariff.details_page_link)
-        all_detailed_info.append(single_page_data)
+        info_to_insert.append(single_page_data)
+
+    await DetailedInformation.insert_many(info_to_insert)
 
     tariffs = Tariffs(
-        general_overview=tariff_overview,
-        detailed_information=all_detailed_info
+        tarrifs_overview=tariffs_overview,
+        detailed_information=info_to_insert
     )
 
     logger.debug(f'The resulting parsed data {tariffs = }')
@@ -52,18 +56,28 @@ async def export_to_json(export_file: Path, data: BaseModel) -> None:
     logger.info(f'Exported the parsing results to {export_file = }')
 
 
+# TODO: Abstract the logic into the Tariffs class
 async def gather_and_save(export_dir: Path) -> Tariffs:
-    present_data = await Tariffs.find_all().to_list()
-    logger.debug(f'Already present db tariff data: {present_data = }')
+    present_general_data = await GeneralTariffInfo.find_all().to_list()
+    present_detailed_data = await DetailedInformation.find_all().to_list()
 
-    if len(present_data) >= 1:
+    present_data = Tariffs(
+        tarrifs_overview=present_general_data,
+        detailed_information=present_detailed_data
+    )
+
+    logger.debug(f'Already present db tariff data: {present_data}')
+
+    if len(present_general_data) >= 1 and len(present_detailed_data):
         logger.info('Skipping parsing as the parsed data is already present in the db')
-        tariffs = present_data[-1]
-    else:
-        tariffs = await parse_everyting()
 
-        logger.info('Inserting the parsed data into the db')
-        await Tariffs.insert(tariffs)
+        return present_data
+
+    tariffs = await parse_everyting()
+
+    logger.info('Inserting the parsed data into the db')
+    await GeneralTariffInfo.insert_many(tariffs.tarrifs_overview)
+    await DetailedInformation.insert_many(tariffs.detailed_information)
 
     # TODO: A config option to either export into json or save to the db
     export_file = export_dir.joinpath('tariffs.json')

@@ -14,6 +14,7 @@ async def init_connection() -> None:
     await init_beanie(
         database=client.db_name,
         document_models=[
-            'data.db.models.Tariffs.Tariffs',
+            'data.db.models.GeneralTariffInfo.GeneralTariffInfo',
+            'data.db.models.DetailedInformation.DetailedInformation'
         ]
     )

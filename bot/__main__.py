@@ -3,11 +3,16 @@ import asyncio
 from aiogram import Bot, Dispatcher
 
 from bot.handlers import router
+from data import DataProvider
+from data.db import init_connection
 from shared.config import config
 from shared.logger import setup_loggers
 
+data_provider = DataProvider()
 
 async def main():
+    await init_connection()
+
     dp = Dispatcher()
     dp.include_router(router)
 
