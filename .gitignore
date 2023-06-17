@@ -1,5 +1,6 @@
 __pycache__
 export
 .venv
-configs/dev.json
+config/dev.json
+runtime.log
 .idea

@@ -1,10 +1,10 @@
 import asyncio
-import logging
 
 from aiogram import Bot, Dispatcher
 
 from bot.handlers import router
-from config import config
+from shared.config import config
+from shared.logger import setup_loggers
 
 
 async def main():
@@ -17,7 +17,7 @@ async def main():
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
+    setup_loggers()
 
     loop = asyncio.new_event_loop()
     loop.run_until_complete(main())

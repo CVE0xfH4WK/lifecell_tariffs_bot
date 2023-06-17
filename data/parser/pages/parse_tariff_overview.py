@@ -1,12 +1,16 @@
 import re
-from parser.schema.GeneralOverview import (INFINITE_DATA_STRING, DataRange,
-                                           GeneralOverview, GeneralTariffInfo,
-                                           PhoneMinutesInfo, ServiceAmountData)
-from parser.utils.redirect_and_create_soup import redirect_and_create_soup
 
 from bs4 import Tag
 from selenium.webdriver.chrome.webdriver import WebDriver
 
+from data.db.models.GeneralOverview import (INFINITE_DATA_STRING, DataRange,
+                                            GeneralOverview, GeneralTariffInfo,
+                                            PhoneMinutesInfo,
+                                            ServiceAmountData)
+from data.parser.utils.redirect_and_create_soup import redirect_and_create_soup
+from shared.logger import get_logger
+
+logger = get_logger(__name__)
 TARIFF_OVERVIEW_URL = 'https://www.lifecell.ua/uk/mobilnij-zvyazok/taryfy/'
 INFINITE_STRING = 'безліміт'
 DATA_UNITS = {
@@ -83,6 +87,8 @@ async def parse_tariff_overview(driver: WebDriver) -> GeneralOverview:
             additional_info=additional_info
         ))
 
+
+    logger.info(f'Parsed the general tariffs overview at {TARIFF_OVERVIEW_URL = }')
     return GeneralOverview(
         tariffs=info
     )
