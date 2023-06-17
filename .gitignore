@@ -3,3 +3,4 @@ export
 .venv
 config/dev.json
 runtime.log
+.idea
